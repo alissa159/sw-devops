@@ -78,6 +78,20 @@ pipeline {
             '''
 
             archiveArtifacts artifacts: "${REPORT_DIR}/success.txt", allowEmptyArchive: false
+
+            emailext(
+                subject: "[Jenkins] Build Success - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+                    <h2>Build and test succeeded!</h2>
+                    <p><b>Job:</b> ${env.JOB_NAME}</p>
+                    <p><b>Build Number:</b> ${env.BUILD_NUMBER}</p>
+                    <p><b>Build URL:</b> <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
+                    <p><b>Result file:</b> success.txt</p>
+                """,
+                to: "alissa325yt1@gmail.com",
+                mimeType: "text/html",
+                attachmentsPattern: "${REPORT_DIR}/success.txt"
+            )
         }
     }
 }
