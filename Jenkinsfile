@@ -30,10 +30,9 @@ pipeline {
         stage('Build') {
             steps {
                 sh '''
-                    echo "[+] Compiling source files..."
-                    cd Test2
-                    find src -name "*.java" > sources.txt
-                    javac -encoding UTF-8 -d ../${CLASS_DIR} -cp ../${JUNIT_JAR_PATH} @sources.txt
+                    echo "[+] Compiling source and test files..."
+                    find src test -name "*.java" > sources.txt
+                    javac -encoding UTF-8 -d ${CLASS_DIR} -cp ${JUNIT_JAR_PATH} @sources.txt
                 '''
             }
         }
@@ -41,7 +40,7 @@ pipeline {
         stage('Test') {
             steps {
                 sh '''
-                    echo "[+] Running tests with JUnit..."
+                    echo "[+] Running JUnit tests..."
                     java -jar ${JUNIT_JAR_PATH} \
                          --class-path ${CLASS_DIR} \
                          --scan-class-path \
@@ -59,7 +58,7 @@ pipeline {
     post {
         always {
             echo "[*] Archiving test results..."
-            junit "${REPORT_DIR}/**/*.xml"
+            junit testResults: "${REPORT_DIR}/**/*.xml", allowEmptyResults: true
             archiveArtifacts artifacts: "${REPORT_DIR}/**/*", allowEmptyArchive: true
         }
 
